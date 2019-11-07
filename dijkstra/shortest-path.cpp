@@ -1,4 +1,4 @@
-#include "/Users/Alvex/Work/CP/bits/stdc++.h"
+#include "stdc++.h"
 using namespace std;
 struct Vertex {
   int id;

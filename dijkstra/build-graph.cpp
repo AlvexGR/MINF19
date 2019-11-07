@@ -1,4 +1,4 @@
-#include "/Users/Alvex/Work/CP/bits/stdc++.h"
+#include "stdc++.h"
 using namespace std;
 int n, m, maze[1000][1000];
 bool isVertex[1000][1000], visited[1000][1000];
