@@ -2,16 +2,16 @@
 using namespace std;
 int n, m, maze[1000][1000];
 bool isVertex[1000][1000], visited[1000][1000];
-int dirX[] = { 0, 0, 1, -1 };
-int dirY[] = { 1, -1, 0, 0 };
+int dirX[] = { 0, 0, 1, -1 }; // direction for x
+int dirY[] = { 1, -1, 0, 0 }; // direction for y
 struct Vertex {
   int id;
   int x, y; // original position
   vector<pair<int, int> > edges;
 };
 vector<Vertex> graph;
-int calIntersection(int u, int v) {
-  return (u - 1) * m + (v - 1);
+int calVertexId(int u, int v) {
+  return (u - 1) * m + (v - 1); // calculate the id
 }
 void traversal(int curX, int curY, int weight, int from) {
   visited[curX][curY] = true;
@@ -19,8 +19,8 @@ void traversal(int curX, int curY, int weight, int from) {
     int nextX = curX + dirX[i];
     int nextY = curY + dirY[i];
     if (maze[nextX][nextY] == 1) {
-      if (isVertex[nextX][nextY] && calIntersection(nextX, nextY) != from) {
-        int id = calIntersection(nextX, nextY);
+      if (isVertex[nextX][nextY] && calVertexId(nextX, nextY) != from) {
+        int id = calVertexId(nextX, nextY);
         for (auto &it : graph) {
           if (it.id == id) {
             bool added = false;
@@ -71,7 +71,7 @@ int main() {
       }
     }
   }
-  // start and end point
+  // start and end points
   int stPos, enPos;
   cin >> stPos >> enPos;
   for (i = 1; i <= n; i++) {
@@ -81,31 +81,35 @@ int main() {
         continue;
       }
       bool isValid = false;
-      if (stPos == calIntersection(i, j) || enPos == calIntersection(i, j)) {
-        isValid = true;
+      // a valid vertex is either stPos or enPos or an intersection or the end of the tunnel
+      if (stPos == calVertexId(i, j) || enPos == calVertexId(i, j)) {
+        isValid = true; // stPos or enPos
       } else {
+        // Intersection or end of the tunnel
         int totalWay = 0;
         for (int k = 0; k < 4; k++) {
           totalWay += maze[i + dirX[k]][j + dirY[k]] == 1 ? 1 : 0;
         }
         isValid = totalWay != 2 ? true : false;
       }
-      if (isValid) {
+      if (isValid) { // a valid vertex => create and save in graph
         Vertex vt;
-        vt.id = calIntersection(i, j);
-        vt.x = i;
-        vt.y = j;
-        graph.push_back(vt);
+        vt.id = calVertexId(i, j); // calculate ID
+        vt.x = i; // store original x
+        vt.y = j; // store original y
+        graph.push_back(vt); // store in graph vector
         isVertex[i][j] = true;
       }
     }
   }
-  // explore the maze
+  // explore the graph
   for (auto it : graph) {
-    if (!visited[it.x][it.y]) {
+    if (!visited[it.x][it.y]) { // traversal only the non visited
       traversal(it.x, it.y, 0, it.id);
     }
   }
+
+  // print out the result
   for (auto it : graph) {
     cout << it.id << " ";
     for (auto jt: it.edges) {
