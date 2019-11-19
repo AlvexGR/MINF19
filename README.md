@@ -6,3 +6,5 @@ Assignments from MINF19
 - Part 2: Apply the algorithm on the graph to find the shortest path from the source to destination (dijkstra/shortest-path.cpp)
 
 Report: https://docs.google.com/document/d/1IAYoJvZuwdtddBz6uZZat9qn6KMD4Po8Loum5bugQNU/edit?usp=sharing
+
+**2/ Minimax algorithm assignment: Tic tac toe** (minimax/minimax.cpp)
