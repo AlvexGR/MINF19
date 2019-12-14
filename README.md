@@ -8,3 +8,5 @@ Assignments from MINF19
 Report: https://docs.google.com/document/d/1IAYoJvZuwdtddBz6uZZat9qn6KMD4Po8Loum5bugQNU/edit?usp=sharing
 
 **2/ Minimax algorithm assignment: Tic tac toe** (minimax/minimax.cpp) / Game with UI (TicTacToe/)
+
+**3/ Social Network assignment:** social_network/
