@@ -24,8 +24,7 @@ public:
 
 vector<Vertex*> vertices;
 vector<vector<Edge*> > edges;
-default_random_engine randomGenerator; // require C++11 to run
-int totalCommunity = 0;
+default_random_engine randomGenerator; // required C++11 to run
 
 void addVertex(Vertex *vertex) {
   vertices.push_back(vertex);
@@ -53,7 +52,7 @@ void makeCommunity(int baseId, int nMember) {
 }
 
 void generateNetwork(int nCommunity, int nMember) {
-  chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // require C++11 to run
+  chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // required C++11 to run
   // Generate nCommunity
   for (int i = 0; i < nCommunity; i++) {
     init(i, nMember);
@@ -62,7 +61,7 @@ void generateNetwork(int nCommunity, int nMember) {
 
   // Connect created communities randomly
   for (int curCommunity = 0; curCommunity < nCommunity; curCommunity++) {
-    // require C++11 to run
+    // required C++11 to run
     uniform_int_distribution<int> randCommunity(0, nCommunity - 1); // random from 0 to nCommunity
     int someCommunity = randCommunity(randomGenerator);
     while (curCommunity == someCommunity) {
@@ -144,10 +143,6 @@ void countCommunityBruteForce() {
   cout << "Found " << totalCommunity << " communities in " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << " milliseconds" << endl;
 }
 
-void countCommunityWithHeuristic() {
-
-}
-
 void destroy() {
   cout << "Cleaning up...!!!" << endl;
   for (auto vertex : vertices) {
@@ -162,13 +157,12 @@ void destroy() {
 }
 
 int main() {
-  int nCommunity = 5;
-  int nMember = 3;
+  int nCommunity = 50000;
+  int nMember = 10;
   generateNetwork(nCommunity, nMember);
-  //printNetwork();
+  // printNetwork();
 
-  //countCommunityBruteForce(); // It's so bad...!!!
-  countCommunityWithHeuristic();
+  countCommunityBruteForce(); // It's so bad...!!!
 
   destroy(); // clean up memory
   return 0;
