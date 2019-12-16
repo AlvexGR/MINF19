@@ -124,6 +124,9 @@ void destroy() {
 }
 
 int main() {
+  // set up random seed
+  randomGenerator.seed((unsigned)time(0));
+
   nCommunity = 5000;
   nMember = 20;
 

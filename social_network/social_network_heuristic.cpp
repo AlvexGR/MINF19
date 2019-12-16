@@ -226,8 +226,11 @@ void destroy() {
 }
 
 int main() {
-  nCommunity = 5000;
-  nMember = 10;
+  // set up random seed
+  randomGenerator.seed((unsigned)time(0));
+
+  nCommunity = 100;
+  nMember = 12;
   generateNetwork(nCommunity, nMember);
   //printNetwork();
 

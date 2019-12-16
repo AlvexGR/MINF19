@@ -24,13 +24,30 @@ public:
 
 vector<Vertex*> vertices;
 vector<vector<Edge*> > edges;
+vector<bool> visited;
+set<pair<int, int> > existedEdges;
 default_random_engine randomGenerator; // required C++11 to run
+int nCommunity;
+int nMember;
 
 void addVertex(Vertex *vertex) {
   vertices.push_back(vertex);
 }
 
 void addEdge(Vertex *from, Vertex *to, double weight) {
+  int fromId = from->id;
+  int toId = to->id;
+
+  if (fromId > toId) {
+    swap(fromId, toId);
+  }
+
+  if (existedEdges.count({fromId, toId}) > 0) {
+    return;
+  } else {
+    existedEdges.insert({fromId, toId});
+  }
+
   edges[from->id].push_back(new Edge(from, to, weight));
   edges[to->id].push_back(new Edge(to, from, weight));
 }
@@ -157,6 +174,9 @@ void destroy() {
 }
 
 int main() {
+  // set up random seed
+  randomGenerator.seed((unsigned)time(0));
+
   int nCommunity = 50000;
   int nMember = 10;
   generateNetwork(nCommunity, nMember);
