@@ -168,7 +168,6 @@ int heuristic(int id, int nTry) {
     }
     toCheckEdges--;
   }
-  visited[id] = true;
   return 0;
 }
 
@@ -200,6 +199,11 @@ void countCommunityWithHeuristic() {
 
   chrono::steady_clock::time_point end = chrono::steady_clock::now();
   cout << "Found " << totalCommunity << " communities in " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << " milliseconds" << endl;
+  int topSize = 0, top = min(3, (int)communitySize.size());
+  for (int i = communitySize.size() - 1, k = 0; i >= 0 && k <= 3; i--, k++) {
+    topSize += communitySize[i];
+  }
+  cout << "Top " << top << ": " << topSize << endl;
   for (int i = communitySize.size() - 1; i >= 0; i--) {
     if (communitySize[i] == 0) {
       continue;
@@ -223,7 +227,7 @@ void destroy() {
 
 int main() {
   nCommunity = 5000;
-  nMember = 20;
+  nMember = 10;
   generateNetwork(nCommunity, nMember);
   //printNetwork();
 
