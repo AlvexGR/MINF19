@@ -166,7 +166,7 @@ int heuristic(int id, int nTry, int nToCheck, bool goThroughVisisted, int increa
       connectedVertices.pop_back();
     }
     nToCheck--;
-    increaseNTry += increaseNTry;
+    nTry += increaseNTry;
   }
   return 0;
 }
@@ -254,7 +254,7 @@ int main() {
   int nTry = 500; // How many tries to find
   bool randomStart = true; // Randomly shuffle the start of heuristic array of vertices
   bool goThroughVisisted = false; // allow multiple communities to have multiple common members
-  int increaseNTry = 5; // increase nTry after every nToCheck
+  int increaseNTry = 0; // increase nTry after every nToCheck
   countCommunityWithHeuristic(nToCheck, nTry, randomStart, goThroughVisisted, increaseNTry);
 
   destroy(); // clean up memory
