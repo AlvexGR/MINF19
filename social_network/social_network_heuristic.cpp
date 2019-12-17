@@ -68,7 +68,7 @@ void makeCommunity(int baseId, int nMember) {
   }
 }
 
-void generateNetwork(int nCommunity, int nMember) {
+void generateNetwork(int nCommunity, int nMember, int nTryConnect = 20) {
   chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // required C++11 to run
   // Generate nCommunity
   for (int i = 0; i < nCommunity; i++) {
@@ -77,7 +77,7 @@ void generateNetwork(int nCommunity, int nMember) {
   }
 
   // Connect created communities randomly - try k times
-  for (int k = 0; k < 20; k++) {
+  for (int k = 0; k < nTryConnect; k++) {
     for (int curCommunity = 0; curCommunity < nCommunity; curCommunity++) {
       // required C++11 to run
       uniform_int_distribution<int> randCommunity(0, nCommunity - 1); // random from 0 to nCommunity
@@ -137,10 +137,10 @@ bool isCommunity(vector<Vertex*> &toCheck) {
   return true;
 }
 
-int heuristic(int id, int nTry) {
+int heuristic(int id, int nTry, int nToCheck, bool goThroughVisisted, int increaseNTry) {
   vector<Vertex*> connectedVertices;
   for (auto edge : edges[id]) {
-    if (visited[edge->from->id] || visited[edge->to->id]) {
+    if (!goThroughVisisted && (visited[edge->from->id] || visited[edge->to->id])) {
       continue;
     }
     if (edge->from->id != id) {
@@ -149,13 +149,12 @@ int heuristic(int id, int nTry) {
       connectedVertices.push_back(edge->to);
     }
   }
-  int toCheckEdges = connectedVertices.size();
-  while (toCheckEdges > 1) {
+  while (nToCheck > 1) {
     for (int i = 0; i < nTry; i++) {
       shuffle(connectedVertices.begin(), connectedVertices.end(), randomGenerator);
       connectedVertices.push_back(vertices[id]);
       vector<Vertex*> toCheck;
-      for (int j = connectedVertices.size() - 1, k = 0; k < toCheckEdges; j--, k++) {
+      for (int j = connectedVertices.size() - 1, k = 0; j >= 0 && k < nToCheck; j--, k++) {
         toCheck.push_back(connectedVertices[j]);
       }
       if (isCommunity(toCheck)) {
@@ -166,30 +165,39 @@ int heuristic(int id, int nTry) {
       }
       connectedVertices.pop_back();
     }
-    toCheckEdges--;
+    nToCheck--;
+    increaseNTry += increaseNTry;
   }
   return 0;
 }
 
-void countCommunityWithHeuristic() {
+void countCommunityWithHeuristic(int nToCheck = 10, int nTry = 10, bool randomStart = true, bool goThroughVisisted = false, int increaseNTry = 1) {
   chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // require C++11 to run
-  int totalCommunity = 0;
 
   // Init possible community size
   vector<int> communitySize;
-  for (int i = 0; i <= nMember; i++) {
+  for (int i = 0; i <= nToCheck; i++) {
     communitySize.push_back(0);
   }
+
+  vector<int> vertexIds;
 
   // Init visited vector
   for (auto vertex : vertices) {
     visited.push_back(false);
+    vertexIds.push_back(vertex->id);
+  }
+
+  int totalCommunity = 0;
+
+  if (randomStart) {
+    shuffle(vertexIds.begin(), vertexIds.end(), randomGenerator);
   }
 
   // Loop through non-visited member
-  for (auto vertex : vertices) {
-    if (!visited[vertex->id]) {
-      int cmSize = heuristic(vertex->id, 100);
+  for (auto vertex : vertexIds) {
+    if (!visited[vertex]) {
+      int cmSize = heuristic(vertex, nTry, nToCheck, goThroughVisisted, increaseNTry);
       if (cmSize >= 3) {
         communitySize[cmSize]++;
         totalCommunity++;
@@ -199,9 +207,14 @@ void countCommunityWithHeuristic() {
 
   chrono::steady_clock::time_point end = chrono::steady_clock::now();
   cout << "Found " << totalCommunity << " communities in " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << " milliseconds" << endl;
-  int topSize = 0, top = min(3, (int)communitySize.size());
-  for (int i = communitySize.size() - 1, k = 0; i >= 0 && k <= 3; i--, k++) {
+  int topSize = 0, top = 0;
+  for (int i = communitySize.size() - 1, k = 0; i >= 0 && k < 3; i--, k++) {
+    if (communitySize[i] == 0) {
+      k--;
+      continue;
+    }
     topSize += communitySize[i];
+    top++;
   }
   cout << "Top " << top << ": " << topSize << endl;
   for (int i = communitySize.size() - 1; i >= 0; i--) {
@@ -226,15 +239,23 @@ void destroy() {
 }
 
 int main() {
-  // set up random seed
+  // Set up random seed
   randomGenerator.seed((unsigned)time(0));
 
-  nCommunity = 100;
-  nMember = 12;
-  generateNetwork(nCommunity, nMember);
-  //printNetwork();
+  // Input
+  nCommunity = 200;
+  nMember = 15;
+  int nTryConnect = 50;
+  generateNetwork(nCommunity, nMember, nTryConnect);
+  // printNetwork();
 
-  countCommunityWithHeuristic();
+  // Set up hyperparameters
+  int nToCheck = nMember;
+  int nTry = 500;
+  bool randomStart = true;
+  bool goThroughVisisted = false;
+  int increaseNTry = 5;
+  countCommunityWithHeuristic(nToCheck, nTry, randomStart, goThroughVisisted, increaseNTry);
 
   destroy(); // clean up memory
   return 0;

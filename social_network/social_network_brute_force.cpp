@@ -68,7 +68,7 @@ void makeCommunity(int baseId, int nMember) {
   }
 }
 
-void generateNetwork(int nCommunity, int nMember) {
+void generateNetwork(int nCommunity, int nMember, int nTryConnect = 20) {
   chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // required C++11 to run
   // Generate nCommunity
   for (int i = 0; i < nCommunity; i++) {
@@ -76,22 +76,24 @@ void generateNetwork(int nCommunity, int nMember) {
     makeCommunity(i, nMember);
   }
 
-  // Connect created communities randomly
-  for (int curCommunity = 0; curCommunity < nCommunity; curCommunity++) {
-    // required C++11 to run
-    uniform_int_distribution<int> randCommunity(0, nCommunity - 1); // random from 0 to nCommunity
-    int someCommunity = randCommunity(randomGenerator);
-    while (curCommunity == someCommunity) {
-      // two communities must be different
-      someCommunity = randCommunity(randomGenerator);
-    }
+  // Connect created communities randomly - try k times
+  for (int k = 0; k < nTryConnect; k++) {
+    for (int curCommunity = 0; curCommunity < nCommunity; curCommunity++) {
+      // required C++11 to run
+      uniform_int_distribution<int> randCommunity(0, nCommunity - 1); // random from 0 to nCommunity
+      int someCommunity = randCommunity(randomGenerator);
+      while (curCommunity == someCommunity) {
+        // two communities must be different
+        someCommunity = randCommunity(randomGenerator);
+      }
 
-    uniform_int_distribution<int> randMember(0, nMember - 1); // random from 0 to nMember
-    addEdge(
-      vertices[curCommunity * nMember + randMember(randomGenerator)],
-      vertices[someCommunity * nMember + randMember(randomGenerator)],
-      1
-    );
+      uniform_int_distribution<int> randMember(0, nMember - 1); // random from 0 to nMember
+      addEdge(
+        vertices[curCommunity * nMember + randMember(randomGenerator)],
+        vertices[someCommunity * nMember + randMember(randomGenerator)],
+        1
+      );
+    }
   }
 
   chrono::steady_clock::time_point end = chrono::steady_clock::now();
@@ -177,8 +179,9 @@ int main() {
   // set up random seed
   randomGenerator.seed((unsigned)time(0));
 
-  int nCommunity = 50000;
-  int nMember = 10;
+  int nCommunity = 5;
+  int nMember = 3;
+  int nTryConnect = 1;
   generateNetwork(nCommunity, nMember);
   // printNetwork();
 

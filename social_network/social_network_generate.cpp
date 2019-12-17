@@ -67,7 +67,7 @@ void makeCommunity(int baseId, int nMember) {
   }
 }
 
-void generateNetwork(int nCommunity, int nMember) {
+void generateNetwork(int nCommunity, int nMember, int nTryConnect = 20) {
   chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // required C++11 to run
   // Generate nCommunity
   for (int i = 0; i < nCommunity; i++) {
@@ -76,7 +76,7 @@ void generateNetwork(int nCommunity, int nMember) {
   }
 
   // Connect created communities randomly - try k times
-  for (int k = 0; k < 20; k++) {
+  for (int k = 0; k < nTryConnect; k++) {
     for (int curCommunity = 0; curCommunity < nCommunity; curCommunity++) {
       // required C++11 to run
       uniform_int_distribution<int> randCommunity(0, nCommunity - 1); // random from 0 to nCommunity
@@ -127,11 +127,11 @@ int main() {
   // set up random seed
   randomGenerator.seed((unsigned)time(0));
 
-  nCommunity = 5000;
-  nMember = 20;
-
-  generateNetwork(nCommunity, nMember);
-  // printNetwork();
+  nCommunity = 3;
+  nMember = 3;
+  int nTryConnect = 1;
+  generateNetwork(nCommunity, nMember, nTryConnect);
+  printNetwork();
 
   destroy(); // clean up memory
   return 0;
