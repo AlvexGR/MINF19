@@ -245,16 +245,16 @@ int main() {
   // Input
   nCommunity = 200;
   nMember = 15;
-  int nTryConnect = 50;
+  int nTryConnect = 50; // number of times to connect nCommunity randomly
   generateNetwork(nCommunity, nMember, nTryConnect);
   // printNetwork();
 
   // Set up hyperparameters
-  int nToCheck = nMember;
-  int nTry = 500;
-  bool randomStart = true;
-  bool goThroughVisisted = false;
-  int increaseNTry = 5;
+  int nToCheck = nMember; // How large the community to check
+  int nTry = 500; // How many tries to find
+  bool randomStart = true; // Randomly shuffle the start of heuristic array of vertices
+  bool goThroughVisisted = false; // allow multiple communities to have multiple common members
+  int increaseNTry = 5; // increase nTry after every nToCheck
   countCommunityWithHeuristic(nToCheck, nTry, randomStart, goThroughVisisted, increaseNTry);
 
   destroy(); // clean up memory
