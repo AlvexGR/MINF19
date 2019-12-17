@@ -5,8 +5,9 @@ Assignments from MINF19
 - Part 1: Build the graph from a maze (dijkstra/build-graph.cpp)
 - Part 2: Apply the algorithm on the graph to find the shortest path from the source to destination (dijkstra/shortest-path.cpp)
 
-Report: https://docs.google.com/document/d/1IAYoJvZuwdtddBz6uZZat9qn6KMD4Po8Loum5bugQNU/edit?usp=sharing
-
 **2/ Minimax algorithm assignment: Tic tac toe** (minimax/minimax.cpp) / Game with UI (TicTacToe/)
 
 **3/ Social Network assignment:** social_network/
+  - social_network_generate.cpp: Generate random social network
+  - social_network_brute_force.cpp: Use previous random social network to find the number of communities (Brute force every single possible combinations)
+  - social_network_heuristic.cpp: Use previous random social network to find the number of communities (Heuristic technique)
