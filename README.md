@@ -1,4 +1,4 @@
-# Master in Software Engineering MINF19
+# Master in Software Engineering - MINF19
 Assignments from MINF19
 
 **1/ Dikstra algorithm assignment: The Tunnel Problem**
