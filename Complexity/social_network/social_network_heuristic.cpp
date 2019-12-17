@@ -44,10 +44,9 @@ void addEdge(Vertex *from, Vertex *to, double weight) {
 
   if (existedEdges.count({fromId, toId}) > 0) {
     return;
-  } else {
-    existedEdges.insert({fromId, toId});
   }
 
+  existedEdges.insert({fromId, toId});
   edges[from->id].push_back(new Edge(from, to, weight));
   edges[to->id].push_back(new Edge(to, from, weight));
 }
@@ -243,8 +242,8 @@ int main() {
   randomGenerator.seed((unsigned)time(0));
 
   // Input
-  nCommunity = 200;
-  nMember = 15;
+  nCommunity = 150;
+  nMember = 100;
   int nTryConnect = 50; // number of times to connect nCommunity randomly
   generateNetwork(nCommunity, nMember, nTryConnect);
   // printNetwork();
