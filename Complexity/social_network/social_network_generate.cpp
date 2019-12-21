@@ -25,6 +25,7 @@ public:
 vector<Vertex*> vertices;
 vector<vector<Edge*> > edges;
 default_random_engine randomGenerator; // required C++11 to run
+set<pair<int, int> > existedEdges;
 int nCommunity;
 int nMember;
 
@@ -32,24 +33,36 @@ void addVertex(Vertex *vertex) {
   vertices.push_back(vertex);
 }
 
-void addEdge(Vertex *from, Vertex *to, double weight) {
+bool addEdge(Vertex *from, Vertex *to, double weight) {
+  int fromId = from->id;
+  int toId = to->id;
+  if (fromId > toId) {
+    swap(fromId, toId);
+  }
+
+  // O(LogN)
+  if (existedEdges.count({fromId, toId}) != 0) {
+    return false;
+  }
+
+  existedEdges.insert({fromId, toId});
   edges[from->id].push_back(new Edge(from, to, weight));
   edges[to->id].push_back(new Edge(to, from, weight));
+  return true;
 }
 
-void init(int baseId, int nMember, vector<Vertex*> &tmpVertices) {
+void init(int baseId, int nMember) {
   for (int i = 0; i < nMember; i++) {
     vertices.push_back(new Vertex(baseId * nMember + i));
-    tmpVertices.push_back(vertices.back());
     vector<Edge*> initEdges;
     edges.push_back(initEdges);
   }
 }
 
-void makeCommunity(vector<Vertex*> &tmpVertices, int from, int to) {
-  for (int i = from; i < to - 1; i++) {
-    for (int j = i + 1; j < to; j++) {
-      addEdge(vertices[tmpVertices[i]->id], vertices[tmpVertices[j]->id], 1);
+void makeCommunity(int baseId, int nMember) {
+  for (int i = 0; i < nMember - 1; i++) {
+    for (int j = i + 1; j < nMember; j++) {
+      addEdge(vertices[baseId * nMember + i], vertices[baseId * nMember + j], 1);
     }
   }
 }
@@ -57,21 +70,10 @@ void makeCommunity(vector<Vertex*> &tmpVertices, int from, int to) {
 void generateNetwork(int nCommunity, int nMember) {
   chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // required C++11 to run
   // Generate nCommunity
-  vector<Vertex*> tmpVertices;
   for (int i = 0; i < nCommunity; i++) {
-    init(i, nMember, tmpVertices);
+    init(i, nMember);
+    makeCommunity(i, nMember);
   }
-
-  // Shuffle the entire vector randomly
-  shuffle(tmpVertices.begin(), tmpVertices.end(), randomGenerator);
-
-  // Make community for continuous segments of nMember
-  for (int i = 0; i < vertices.size(); i += nMember) {
-    makeCommunity(tmpVertices, i, i + nMember);
-  }
-
-  // Store existed edges
-  set<pair<int, int> > existedEdges;
 
   // Try to connect randomly for nConnect time
   // BE AWARE: Change this number if the network is too big
@@ -94,14 +96,7 @@ void generateNetwork(int nCommunity, int nMember) {
       do {
         stId = curCommunity * nMember + randMember(randomGenerator);
         ndId = someCommunity * nMember + randMember(randomGenerator);
-        if (stId > ndId) {
-          swap(stId, ndId);
-        }
-        // retry until find non existed edge O(LogN)
-      } while (existedEdges.count({stId, ndId}) > 0);
-
-      existedEdges.insert({stId, ndId});
-      addEdge(vertices[stId], vertices[ndId], 1);
+      } while (!addEdge(vertices[stId], vertices[ndId], 1));
     }
   }
 
@@ -121,17 +116,18 @@ void printNetwork() {
 }
 
 bool checkDuplicateEdges() {
-  set<pair<int, int> > existedEdges;
+  set<pair<int, int> > local_existedEdges;
   for (auto vertex : vertices) {
     for (auto edge : edges[vertex->id]) {
-      if (existedEdges.count({edge->from->id, edge->to->id}) == 0) {
-        existedEdges.insert({edge->from->id, edge->to->id});
+      if (local_existedEdges.count({edge->from->id, edge->to->id}) == 0) {
+        local_existedEdges.insert({edge->from->id, edge->to->id});
       } else {
-        return false;
+        cout << edge->from->id << " " << edge->to->id << endl;
+        return true;
       }
     }
   }
-  return true;
+  return false;
 }
 
 void destroy() {
@@ -151,13 +147,13 @@ int main() {
   // set up random seed
   randomGenerator.seed((unsigned)time(0));
 
-  nCommunity = 50;
-  nMember = 50;
+  nCommunity = 3000;
+  nMember = 100;
   generateNetwork(nCommunity, nMember);
-  //printNetwork();
+  // printNetwork();
 
-  // string dup = checkDuplicateEdges() ? "YES" : "NO";
-  // cout << "Duplicate: " << dup << endl;
+  string dup = checkDuplicateEdges() ? "YES" : "NO";
+  cout << "Duplicated: " << dup << endl;
 
   destroy(); // clean up memory
   return 0;
