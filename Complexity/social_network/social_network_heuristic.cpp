@@ -190,7 +190,6 @@ int heuristic(int id, int nTry, int nToCheck, bool goThroughVisited, int increas
 
 void countCommunityWithHeuristic(int nToCheck = 10, int nTry = 10, bool goThroughVisited = false, int increaseNTry = 1) {
   chrono::steady_clock::time_point begin = std::chrono::steady_clock::now(); // require C++11 to run
-
   // Init possible community size
   vector<int> communitySize;
   for (int i = 0; i <= nToCheck; i++) {
@@ -252,8 +251,8 @@ int main() {
   randomGenerator.seed((unsigned)time(0));
 
   // Input
-  nCommunity = 50;
-  nMember = 100;
+  nCommunity = 5;
+  nMember = 10;
   generateNetwork(nCommunity, nMember);
   // printNetwork();
 
